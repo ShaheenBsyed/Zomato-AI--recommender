@@ -41,6 +41,19 @@ def load_store():
 store = load_store()
 cities = store.get_cities() if store else []
 
+@st.cache_resource
+def get_all_cuisines(_store):
+    if not _store:
+        return []
+    cuisines = set()
+    for r in _store.restaurants:
+        for c in r.cuisines:
+            if c:
+                cuisines.add(c.strip())
+    return sorted(list(cuisines))
+
+all_cuisines = get_all_cuisines(store) if store else []
+
 # High-quality food imagery mapping
 CUISINE_IMAGES = {
     "north indian": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=400&q=80",
@@ -665,12 +678,17 @@ with st.container(border=True):
         st.session_state.location = selected_location
         
     with col2:
-        selected_cuisine = st.text_input(
+        cuisine_options = ["Any Cuisine"] + all_cuisines
+        curr_c_idx = 0
+        if st.session_state.cuisine in cuisine_options:
+            curr_c_idx = cuisine_options.index(st.session_state.cuisine)
+            
+        selected_cuisine = st.selectbox(
             "Cuisine",
-            value=st.session_state.cuisine,
-            placeholder="e.g. North Indian"
+            options=cuisine_options,
+            index=curr_c_idx
         )
-        st.session_state.cuisine = selected_cuisine
+        st.session_state.cuisine = "" if selected_cuisine == "Any Cuisine" else selected_cuisine
         
     with col3:
         budget_options = ["₹", "₹₹", "₹₹₹", "₹₹₹₹"]
