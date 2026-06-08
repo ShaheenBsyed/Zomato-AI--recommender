@@ -4,8 +4,14 @@ from __future__ import annotations
 
 import base64
 import logging
+import html
 import os
 import streamlit as st
+
+def escapeHTML(text):
+    if text is None:
+        return ""
+    return html.escape(str(text))
 
 # Setup Logging
 logger = logging.getLogger("zomato_streamlit")
