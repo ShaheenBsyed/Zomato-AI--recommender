@@ -18,12 +18,13 @@ class LLMAPIError(Exception):
     pass
 
 class LLMClient:
-    """Handles communication with LLM providers (Gemini or OpenAI) with retry logic."""
+    """Handles communication with LLM providers (Gemini, OpenAI, or Groq) with retry logic."""
 
     def __init__(self) -> None:
         # Load environment variables (dotenv is loaded at the app level)
         self.gemini_key = os.getenv("GEMINI_API_KEY")
         self.openai_key = os.getenv("OPENAI_API_KEY")
+        self.groq_key = os.getenv("GROQ_API_KEY")
         self.provider = os.getenv("LLM_PROVIDER", "").strip().lower()
 
         # Auto-detect provider if not explicitly set
@@ -32,6 +33,8 @@ class LLMClient:
                 self.provider = "gemini"
             elif self.openai_key:
                 self.provider = "openai"
+            elif self.groq_key:
+                self.provider = "groq"
             else:
                 self.provider = "none"
 
@@ -47,17 +50,21 @@ class LLMClient:
             return False
         if self.provider == "openai" and not self.openai_key:
             return False
+        if self.provider == "groq" and not self.groq_key:
+            return False
         return True
 
     def generate_recommendations(self, prompt: str) -> str:
         """Calls the configured LLM API with retries and exponential backoff."""
         if self.provider == "none":
-            raise LLMConfigurationError("No LLM API keys provided. Please set GEMINI_API_KEY or OPENAI_API_KEY.")
+            raise LLMConfigurationError("No LLM API keys provided. Please set GEMINI_API_KEY, OPENAI_API_KEY, or GROQ_API_KEY.")
 
         if self.provider == "gemini":
             return self._call_gemini_with_retry(prompt)
         elif self.provider == "openai":
             return self._call_openai_with_retry(prompt)
+        elif self.provider == "groq":
+            return self._call_groq_with_retry(prompt)
         else:
             raise LLMConfigurationError(f"Unsupported LLM provider: {self.provider}")
 
@@ -143,3 +150,44 @@ class LLMClient:
                     time.sleep(base_delay * (2 ** (attempt - 1)))
 
         raise LLMAPIError(f"OpenAI API request failed after {max_retries} attempts.") from last_err
+
+    def _call_groq_with_retry(self, prompt: str, max_retries: int = 3, base_delay: float = 2.0) -> str:
+        """Calls Groq API using groq SDK."""
+        last_err: Optional[Exception] = None
+
+        try:
+            from groq import Groq
+        except ImportError as exc:
+            raise LLMConfigurationError(
+                "The 'groq' SDK is required for Groq. Install with: pip install groq"
+            ) from exc
+
+        try:
+            client = Groq(api_key=self.groq_key)
+        except Exception as exc:
+            raise LLMConfigurationError(f"Failed to initialize Groq Client: {exc}") from exc
+
+        model_name = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+
+        for attempt in range(1, max_retries + 1):
+            try:
+                logger.info("Sending prompt to Groq model %s (attempt %d/%d)...", model_name, attempt, max_retries)
+                chat_completion = client.chat.completions.create(
+                    messages=[
+                        {"role": "user", "content": prompt}
+                    ],
+                    model=model_name,
+                    temperature=0.2,
+                    response_format={"type": "json_object"}
+                )
+                text = chat_completion.choices[0].message.content
+                if not text:
+                    raise LLMAPIError("Groq returned an empty response.")
+                return text
+            except Exception as exc:
+                last_err = exc
+                logger.warning("Groq API call failed (attempt %d/%d): %s", attempt, max_retries, exc)
+                if attempt < max_retries:
+                    time.sleep(base_delay * (2 ** (attempt - 1)))
+
+        raise LLMAPIError(f"Groq API request failed after {max_retries} attempts.") from last_err

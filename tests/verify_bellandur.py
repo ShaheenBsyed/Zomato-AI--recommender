@@ -53,7 +53,7 @@ def main():
     llm_client = LLMClient()
     
     if not llm_client.ping():
-        print("\n[WARNING] GEMINI_API_KEY is not configured in your .env file!")
+        print(f"\n[WARNING] API Key for provider '{llm_client.provider}' is not configured in your .env file!")
         print("Showing structured Fallback Ranker output instead.")
         fallback_res = generate_fallback_recommendations(candidates, prefs, "API key not configured.")
         formatted = format_recommendation_response(fallback_res)
@@ -61,13 +61,18 @@ def main():
         print(json.dumps(formatted, indent=2))
         return
         
-    print(f"\nGEMINI_API_KEY is configured. Sending prompt to Gemini ({os.getenv('GEMINI_MODEL', 'gemini-2.5-flash')})...")
+    provider_name = llm_client.provider.upper()
+    model_env_var = f"{provider_name}_MODEL"
+    default_model = "gemini-2.5-flash" if llm_client.provider == "gemini" else ("gpt-4o-mini" if llm_client.provider == "openai" else "llama-3.3-70b-versatile")
+    active_model = os.getenv(model_env_var, default_model)
+    
+    print(f"\nAPI Key for provider '{llm_client.provider}' is configured. Sending prompt to {provider_name} ({active_model})...")
     try:
         prompt = build_prompt_payload(candidates, prefs)
         response_text = llm_client.generate_recommendations(prompt)
         result = parse_llm_response(response_text, candidates, prefs)
         formatted = format_recommendation_response(result)
-        print("\nSuccess! Gemini Recommendations:")
+        print(f"\nSuccess! {provider_name} Recommendations:")
         print(json.dumps(formatted, indent=2))
     except Exception as e:
         print(f"\nAPI Call failed: {e}")
