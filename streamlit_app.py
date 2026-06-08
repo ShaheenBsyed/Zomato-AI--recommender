@@ -289,15 +289,16 @@ st.markdown("""
             grid-template-columns: 1fr;
         }
     }
-    
-    /* Recommendation Card Design */
+       /* Recommendation Card Design (Simplified) */
     .restaurant-card {
         background-color: #ffffff;
         border: 1px solid #e8e8e8;
         border-radius: 20px;
         overflow: hidden;
+        position: relative;
         box-shadow: 0 10px 30px rgba(28, 28, 28, 0.04), 0 1px 3px rgba(28, 28, 28, 0.01);
         display: flex;
+        flex-direction: column;
         transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     }
     
@@ -307,33 +308,12 @@ st.markdown("""
         border-color: #ffd1d3;
     }
     
-    .card-image-box {
-        width: 170px;
-        height: 100%;
-        min-height: 180px;
-        position: relative;
-        overflow: hidden;
-        flex-shrink: 0;
-    }
-    
-    .card-image-box img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center;
-        transition: transform 0.6s ease;
-    }
-    
-    .restaurant-card:hover .card-image-box img {
-        transform: scale(1.04);
-    }
-    
     .favorite-btn {
         position: absolute;
-        top: 10px;
-        right: 10px;
+        top: 18px;
+        right: 18px;
         z-index: 10;
-        background-color: rgba(255, 255, 255, 0.85);
+        background-color: #f8f8f8;
         border: none;
         color: #696969;
         border-radius: 50%;
@@ -343,11 +323,12 @@ st.markdown("""
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        transition: background-color 0.2s, color 0.2s;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        transition: background-color 0.2s, color 0.2s, transform 0.2s;
     }
     
     .favorite-btn:hover {
+        transform: scale(1.08);
         background-color: #ffffff;
         color: #E23744;
     }
@@ -358,18 +339,24 @@ st.markdown("""
     
     .favorite-btn .material-symbols-outlined {
         font-size: 18px;
+        font-variation-settings: 'FILL' 0;
+    }
+    
+    .favorite-btn.active .material-symbols-outlined {
+        font-variation-settings: 'FILL' 1;
     }
     
     .card-details-container {
         flex: 1;
         display: flex;
-        padding: 16px;
-        gap: 16px;
+        flex-direction: column;
+        padding: 20px 24px;
+        gap: 12px;
         min-width: 0;
     }
     
     .card-info {
-        flex: 1.2;
+        width: 100%;
         display: flex;
         flex-direction: column;
         gap: 6px;
@@ -912,13 +899,10 @@ if st.session_state.submitted:
                         
                         cards_html += f"""
                         <div class="restaurant-card">
-                            <div class="card-image-box">
-                                <img src="{cuisine_img}">
+                            <div class="card-details-container">
                                 <button class="favorite-btn">
                                     <span class="material-symbols-outlined">favorite</span>
                                 </button>
-                            </div>
-                            <div class="card-details-container">
                                 <div class="card-info">
                                     <h3 class="restaurant-name">{escapeHTML(name)}</h3>
                                     <div class="restaurant-cuisine-area">{escapeHTML(area_text)}</div>

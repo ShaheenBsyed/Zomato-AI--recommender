@@ -957,13 +957,16 @@ select:focus, input[type="text"]:focus {
 }
 
 /* Recommendation Horizontal Card Styling */
+/* Recommendation Horizontal Card Styling (Simplified) */
 .restaurant-card {
     background-color: #ffffff;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
     overflow: hidden;
+    position: relative;
     box-shadow: var(--shadow-soft);
     display: flex;
+    flex-direction: column;
     transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
     animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
@@ -974,34 +977,12 @@ select:focus, input[type="text"]:focus {
     border-color: var(--color-primary-border);
 }
 
-/* Card Image Block */
-.card-image-box {
-    width: 170px;
-    height: 100%;
-    min-height: 180px;
-    position: relative;
-    overflow: hidden;
-    flex-shrink: 0;
-}
-
-.card-image-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.restaurant-card:hover .card-image-box img {
-    transform: scale(1.04);
-}
-
 .favorite-btn {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 18px;
+    right: 18px;
     z-index: 10;
-    background-color: rgba(255, 255, 255, 0.85);
+    background-color: var(--color-surface-muted);
     border: none;
     color: var(--color-text-muted);
     border-radius: 50%;
@@ -1011,7 +992,7 @@ select:focus, input[type="text"]:focus {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     transition: transform var(--transition-fast), background-color var(--transition-fast), color var(--transition-fast);
 }
 
@@ -1034,28 +1015,21 @@ select:focus, input[type="text"]:focus {
     font-variation-settings: 'FILL' 1;
 }
 
-/* Card Details Container (Split columns inside details block) */
+/* Card Details Container (Simplified inline stacked layout) */
 .card-details-container {
     flex: 1;
     display: flex;
-    padding: 16px;
-    gap: 16px;
-}
-
-@media (max-width: 576px) {
-    .card-details-container {
-        flex-direction: column;
-        gap: 12px;
-    }
+    flex-direction: column;
+    padding: 20px 24px;
+    gap: 12px;
 }
 
 /* Main Info Column */
 .card-info {
-    flex: 1.2;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 6px;
-    min-width: 0; /* Enable text truncation */
 }
 
 .restaurant-name {
@@ -1064,6 +1038,7 @@ select:focus, input[type="text"]:focus {
     font-weight: 700;
     color: var(--color-text-main);
     line-height: 1.25;
+    padding-right: 36px; /* Avoid overlapping absolute favorite button */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1131,12 +1106,12 @@ select:focus, input[type="text"]:focus {
     border: 1px solid var(--color-border);
 }
 
-/* AI Explanation Column */
+/* AI Explanation Box (Full width stacked below details) */
 .ai-reason-box {
-    flex: 0.9;
+    width: 100%;
     background-color: var(--color-primary-light);
     border-radius: var(--radius-md);
-    padding: 12px;
+    padding: 10px 14px;
     display: flex;
     flex-direction: column;
     gap: 4px;

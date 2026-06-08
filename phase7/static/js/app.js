@@ -644,15 +644,12 @@ document.addEventListener("DOMContentLoaded", () => {
             // Mock dynamic distances for scannability
             const mockDistance = `${rec.rank * 230 + 350} m`;
 
-            // Build premium HTML structure
+            // Build premium HTML structure (Simplified without images)
             card.innerHTML = `
-                <div class="card-image-box">
-                    <img src="${cuisineImg}" alt="${escapeHTML(rec.name)}" onerror="this.src='https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=400&q=80';">
+                <div class="card-details-container">
                     <button class="favorite-btn" aria-label="Add to favorites">
                         <span class="material-symbols-outlined">favorite</span>
                     </button>
-                </div>
-                <div class="card-details-container">
                     <div class="card-info">
                         <h3 class="restaurant-name" title="${escapeHTML(rec.name)}">${escapeHTML(rec.name)}</h3>
                         <div class="restaurant-cuisine-area">${areaText}</div>
