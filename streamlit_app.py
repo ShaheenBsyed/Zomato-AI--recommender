@@ -888,7 +888,8 @@ if st.session_state.submitted:
                         rec_cuisines = rec.get("cuisines", [])
                         
                         cuisine_img = get_cuisine_image(rec_cuisines)
-                        area_text = f"{rec_cuisines[0]} • {rec.get('area', '')}" if rec.get('area') else rec_cuisines[0]
+                        cuisine_primary = rec_cuisines[0] if rec_cuisines else "Cuisine"
+                        area_text = f"{cuisine_primary} • {rec.get('area', '')}" if rec.get('area') else cuisine_primary
                         mock_distance = f"{rank * 230 + 350} m"
                         
                         all_tags = list(rec_cuisines)
