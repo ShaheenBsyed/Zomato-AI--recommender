@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Preference tags elements
     const prefChips = document.querySelectorAll(".pref-chip-btn:not(.add-more-btn)");
     const addMoreBtn = document.getElementById("add-more-chip-btn");
-    
+
     // Custom Tag Modal elements
     const customTagModal = document.getElementById("custom-tag-modal");
     const customTagInput = document.getElementById("custom-tag-input");
@@ -113,9 +113,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             const locations = await response.json();
             loadedLocations = locations;
-            
+
             // Populate select dropdown
-            locationSelect.innerHTML = '<option value="" disabled selected>e.g., Mumbai</option>';
+            locationSelect.innerHTML = '<option value="" disabled selected>e.g., BTM</option>';
             locations.forEach(loc => {
                 const opt = document.createElement("option");
                 opt.value = loc;
@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Synchronize selected chips and conversational search text into contextTextarea
     function syncContextTextarea() {
         let parts = [];
-        
+
         // Gathers search bar craving text
         const searchVal = searchInput.value.trim();
         if (searchVal) {
@@ -170,7 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Joins preferences into context string
         contextTextarea.value = parts.join(", ");
-        
+
         // Trigger character counter check
         contextTextarea.dispatchEvent(new Event("input"));
     }
@@ -199,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (cuisineVal) {
                     document.getElementById("cuisine-input").value = cuisineVal;
                 }
-                
+
                 if (contextVal) {
                     // Activate corresponding chip in UI
                     const formChip = document.querySelector(`.pref-chip-btn[data-value="${contextVal.toLowerCase()}"]`);
@@ -219,7 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // Set search input value
                 searchInput.value = chip.getAttribute("data-value") || chip.textContent.trim().replace(/^[\s\S]*?\s/, "");
-                
+
                 syncContextTextarea();
 
                 // Auto-submit search query
@@ -231,7 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Actions when conversational search fires
     function triggerConversationalSearch() {
         syncContextTextarea();
-        
+
         // Auto-select a location if none is selected yet to prevent validation block
         if (!locationSelect.value && loadedLocations.length > 0) {
             // Pick first neighborhood as default or popular one
@@ -281,7 +281,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Dynamically insert custom preference chips
     function addCustomPreferenceChip(label) {
         const value = label.toLowerCase();
-        
+
         // Verify if a chip with the same value already exists
         const existing = document.querySelector(`.pref-chip-btn[data-value="${value}"]`);
         if (existing) {
@@ -296,7 +296,7 @@ document.addEventListener("DOMContentLoaded", () => {
         btn.className = "pref-chip-btn active";
         btn.setAttribute("data-value", value);
         btn.textContent = label;
-        
+
         // Listeners for toggle
         btn.addEventListener("click", () => {
             btn.classList.toggle("active");
@@ -329,10 +329,10 @@ document.addEventListener("DOMContentLoaded", () => {
                         // Return a random neighborhood to simulate geolocation lookup
                         const randomLoc = loadedLocations[Math.floor(Math.random() * loadedLocations.length)];
                         locationSelect.value = randomLoc;
-                        
+
                         // Notify user via console or search placeholder
                         searchInput.placeholder = `📍 Located near ${randomLoc}`;
-                        
+
                         geoBtn.style.color = "var(--color-success)";
                         setTimeout(() => {
                             geoBtn.style.color = "";
@@ -429,12 +429,12 @@ document.addEventListener("DOMContentLoaded", () => {
             submitBtn.disabled = true;
             submitBtnSpinner.classList.remove("hidden");
             submitBtnText.textContent = "Curating...";
-            
+
             placeholderBox.classList.add("hidden");
             resultsContent.classList.add("hidden");
             errorBox.classList.add("hidden");
             loadingBox.classList.remove("hidden");
-            
+
             aiBadge.classList.add("hidden");
             fallbackBadge.classList.add("hidden");
             suggestionsContainer.classList.add("hidden");
@@ -491,20 +491,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
         suggestions.forEach(suggestion => {
             const text = suggestion.toLowerCase();
-            
+
             // 1. Cuisine restriction
             if (text.includes("cuisine")) {
                 const match = suggestion.match(/['"]([^'"]+)['"]/);
                 const cuisineName = match ? match[1] : "";
                 const label = cuisineName ? `Remove '${cuisineName}' cuisine` : "Remove cuisine restriction";
-                
+
                 const chip = createSuggestionChip(label, "restaurant_menu", () => {
                     document.getElementById("cuisine-input").value = "";
                     form.dispatchEvent(new Event("submit"));
                 });
                 suggestionsList.appendChild(chip);
             }
-            
+
             // 2. Rating requirement
             else if (text.includes("rating")) {
                 const match = suggestion.match(/(\d+\.\d+|\d+)/);
@@ -514,7 +514,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     targetRating = parseFloat(match[0]);
                     label = `Lower rating requirement (try ${targetRating}★ or below)`;
                 }
-                
+
                 const chip = createSuggestionChip(label, "star_half", () => {
                     const ratingSelect = document.getElementById("rating-select");
                     if (ratingSelect) {
@@ -531,13 +531,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
                 suggestionsList.appendChild(chip);
             }
-            
+
             // 3. Budget tier restriction
             else if (text.includes("budget")) {
                 const hasLow = text.includes("low");
                 const hasMedium = text.includes("medium");
                 const hasHigh = text.includes("high");
-                
+
                 const addBudgetChip = (tier, tierLabel) => {
                     const chip = createSuggestionChip(`Switch to ${tierLabel} budget`, "payments", () => {
                         const radio = document.getElementById(`budget-${tier}`);
@@ -553,7 +553,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (hasLow) { addBudgetChip("low", "Low"); added = true; }
                 if (hasMedium) { addBudgetChip("medium", "Medium"); added = true; }
                 if (hasHigh) { addBudgetChip("high", "High"); added = true; }
-                
+
                 if (!added) {
                     const activeBudgetRadio = document.querySelector('input[name="budget"]:checked');
                     const activeBudget = activeBudgetRadio ? activeBudgetRadio.value : "medium";
@@ -564,7 +564,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
             }
-            
+
             // 4. Default / General suggestion
             else {
                 const chip = createSuggestionChip(suggestion, "explore", () => {
@@ -640,7 +640,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Format area details
             const areaText = rec.area ? `${escapeHTML(rec.cuisines[0] || 'Cuisine')} • ${escapeHTML(rec.area)}` : escapeHTML(rec.cuisines[0] || 'Cuisine');
-            
+
             // Mock dynamic distances for scannability
             const mockDistance = `${rec.rank * 230 + 350} m`;
 
@@ -666,7 +666,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>
                     <div class="ai-reason-box">
                         <div class="ai-reason-header">
-                            <span class="material-symbols-outlined sparkle-icon">sparkles</span>
+                            <span class="sparkle-icon">✨</span>
                             <span>Why AI picked this</span>
                         </div>
                         <p class="ai-reason-text">${escapeHTML(rec.explanation)}</p>

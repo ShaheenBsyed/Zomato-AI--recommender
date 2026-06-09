@@ -673,22 +673,17 @@ with st.container(border=True):
             "Location",
             options=cities,
             index=cities.index(st.session_state.location) if st.session_state.location in cities else 0,
-            placeholder="e.g. Mumbai"
+            placeholder="e.g. BTM"
         )
         st.session_state.location = selected_location
         
     with col2:
-        cuisine_options = ["Any Cuisine"] + all_cuisines
-        curr_c_idx = 0
-        if st.session_state.cuisine in cuisine_options:
-            curr_c_idx = cuisine_options.index(st.session_state.cuisine)
-            
-        selected_cuisine = st.selectbox(
+        selected_cuisine = st.text_input(
             "Cuisine",
-            options=cuisine_options,
-            index=curr_c_idx
+            value=st.session_state.cuisine,
+            placeholder="e.g. North Indian"
         )
-        st.session_state.cuisine = "" if selected_cuisine == "Any Cuisine" else selected_cuisine
+        st.session_state.cuisine = selected_cuisine
         
     with col3:
         budget_options = ["₹", "₹₹", "₹₹₹", "₹₹₹₹"]
