@@ -3,8 +3,9 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://zomato-backend.onrender.com/api/:path*"
+      "destination": "https://zomato-backend-shaheenbsyed.onrender.com/api/:path*"
     }
   ]
 }
+
 

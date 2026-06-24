@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: zomato-backend
+    name: zomato-backend-shaheenbsyed
     runtime: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
@@ -9,3 +9,4 @@ services:
         sync: false
       - key: FLASK_ENV
         value: production
+
