@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://zomato-backend-shaheenbsyed.onrender.com/api/:path*"
+      "destination": "https://zomato-ai-recommender.onrender.com/api/:path*"
     }
   ]
 }
