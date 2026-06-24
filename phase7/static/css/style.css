@@ -1325,3 +1325,194 @@ select:focus, input[type="text"]:focus {
         transform: rotate(360deg);
     }
 }
+
+/* Premium Glassmorphic Loading Overlay */
+#global-loading-overlay {
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    z-index: 200; /* Higher than top-navbar */
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#global-loading-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.loading-card {
+    background-color: rgba(255, 255, 255, 0.85);
+    border: 1px solid var(--color-primary-border);
+    border-radius: var(--radius-xl);
+    padding: 40px;
+    width: 90%;
+    max-width: 480px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(226, 55, 68, 0.1);
+    transform: translateY(20px) scale(0.95);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+#global-loading-overlay.visible .loading-card {
+    transform: translateY(0) scale(1);
+}
+
+/* Bouncing/pulsing food emojis */
+.loading-food-animation {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin-bottom: 12px;
+}
+
+.food-emoji {
+    font-size: 28px;
+    position: absolute;
+    animation: float-around 3s infinite ease-in-out;
+}
+
+.bubble-1 {
+    top: 10px;
+    left: 10px;
+    animation-delay: 0s;
+}
+
+.bubble-2 {
+    top: 10px;
+    right: 10px;
+    animation-delay: 0.75s;
+}
+
+.bubble-3 {
+    bottom: 10px;
+    left: 10px;
+    animation-delay: 1.5s;
+}
+
+.bubble-4 {
+    bottom: 10px;
+    right: 10px;
+    animation-delay: 2.25s;
+}
+
+.main-pulse {
+    font-size: 42px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: heartbeat 1.5s infinite ease-in-out;
+}
+
+@keyframes float-around {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-12px) scale(1.15);
+    }
+}
+
+@keyframes heartbeat {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+    }
+}
+
+.loading-card h3 {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.loading-card p {
+    font-size: 14.5px;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+}
+
+/* Premium Linear Progress Bar */
+.premium-progress-bar {
+    width: 100%;
+    height: 6px;
+    background-color: var(--color-surface-muted);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+    margin: 8px 0;
+}
+
+.progress-bar-fill {
+    width: 0;
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primary) 0%, #ff8e95 100%);
+    border-radius: var(--radius-pill);
+    animation: animate-progress 2s infinite ease-in-out;
+}
+
+@keyframes animate-progress {
+    0% {
+        width: 10%;
+        margin-left: 0;
+    }
+    50% {
+        width: 40%;
+        margin-left: 60%;
+    }
+    100% {
+        width: 10%;
+        margin-left: 0;
+    }
+}
+
+/* Nap Warning & Error Styling */
+.nap-warning {
+    font-size: 13.5px !important;
+    font-weight: 500;
+    color: var(--color-warning) !important;
+    background-color: var(--color-warning-bg);
+    border: 1px solid rgba(180, 83, 9, 0.15);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    animation: fadeIn var(--transition-normal) forwards;
+}
+
+.error-text {
+    font-size: 14px !important;
+    font-weight: 600;
+    color: var(--color-error) !important;
+    margin-bottom: 12px;
+}
+
+.btn-retry {
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 24px;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.btn-retry:hover {
+    background-color: var(--color-primary-hover);
+    transform: translateY(-1px);
+}
+

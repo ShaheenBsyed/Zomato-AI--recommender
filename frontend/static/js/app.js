@@ -96,7 +96,75 @@ document.addEventListener("DOMContentLoaded", () => {
             .replace(/'/g, "&#039;");
     }
 
+    // Global Loading Overlay elements
+    const globalLoadingOverlay = document.getElementById("global-loading-overlay");
+    const loadingTitle = document.getElementById("loading-title");
+    const loadingSubtitle = document.getElementById("loading-subtitle");
+    const loadingProgressBar = document.getElementById("loading-progress-bar");
+    const loadingNapText = document.getElementById("loading-nap-text");
+    const loadingErrorContainer = document.getElementById("loading-error-container");
+    const loadingErrorMessage = document.getElementById("loading-error-message");
+    const loadingRetryBtn = document.getElementById("loading-retry-btn");
+
+    let napTimer = null;
+
+    // Global Loading Overlay Helper Functions
+    function showGlobalLoading(title, subtitle, onRetryCallback) {
+        // Clear any existing timer
+        if (napTimer) clearTimeout(napTimer);
+        
+        // Reset overlay UI state
+        loadingTitle.textContent = title;
+        loadingSubtitle.textContent = subtitle;
+        loadingProgressBar.classList.remove("hidden");
+        loadingNapText.classList.add("hidden");
+        loadingErrorContainer.classList.add("hidden");
+        
+        // Show overlay
+        globalLoadingOverlay.classList.remove("hidden");
+        // Trigger reflow to ensure CSS transition works
+        globalLoadingOverlay.offsetHeight;
+        globalLoadingOverlay.classList.add("visible");
+        
+        // Setup 15s timer for cold start warning
+        napTimer = setTimeout(() => {
+            loadingNapText.classList.remove("hidden");
+        }, 15000);
+        
+        // Setup retry click handler
+        if (onRetryCallback) {
+            loadingRetryBtn.onclick = () => {
+                showGlobalLoading(title, subtitle, onRetryCallback); // Reset overlay state
+                onRetryCallback();
+            };
+        } else {
+            loadingRetryBtn.onclick = null;
+        }
+    }
+
+    function showGlobalLoadingError(message) {
+        if (napTimer) clearTimeout(napTimer);
+        loadingProgressBar.classList.add("hidden");
+        loadingNapText.classList.add("hidden");
+        
+        loadingErrorMessage.textContent = message;
+        loadingErrorContainer.classList.remove("hidden");
+    }
+
+    function hideGlobalLoading() {
+        if (napTimer) clearTimeout(napTimer);
+        globalLoadingOverlay.classList.remove("visible");
+        
+        // Wait for CSS fade-out transition to complete before adding .hidden
+        setTimeout(() => {
+            if (!globalLoadingOverlay.classList.contains("visible")) {
+                globalLoadingOverlay.classList.add("hidden");
+            }
+        }, 400);
+    }
+
     // Initialize Page
+    showGlobalLoading("🍕 Sniffing out the best restaurants in town...", "This may take up to a minute on the first visit.", loadLocations);
     loadLocations();
     setupCharCounter();
     setupPreferenceToggles();
@@ -123,10 +191,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 locationSelect.appendChild(opt);
             });
             locationSelect.disabled = false;
+            
+            // Success: Hide overlay
+            hideGlobalLoading();
         } catch (err) {
             console.error(err);
             locationSelect.innerHTML = '<option value="" disabled selected>Error loading neighborhoods</option>';
-            showError("Could not retrieve neighborhood list from backend. Please refresh the page.");
+            showGlobalLoadingError("Could not retrieve neighborhood list from backend. Please check if the server is running and try again.");
         }
     }
 
@@ -363,7 +434,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 7. Handle preference form submission
     form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+        if (e && e.preventDefault) e.preventDefault();
 
         // Sync inputs before send
         syncContextTextarea();
@@ -382,45 +453,53 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Set Loading State
-        setLoading(true);
+        const fetchRecommendations = async () => {
+            showGlobalLoading("🍕 Sniffing out the best restaurants in town...", "This may take up to a minute on the first visit.", fetchRecommendations);
+            setLoading(true);
 
-        try {
-            const response = await fetch("/api/recommend", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    location,
-                    budget,
-                    cuisine: cuisine || null,
-                    min_rating: minRating,
-                    additional_context: additionalContext
-                })
-            });
+            try {
+                const response = await fetch("/api/recommend", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        location,
+                        budget,
+                        cuisine: cuisine || null,
+                        min_rating: minRating,
+                        additional_context: additionalContext
+                    })
+                });
 
-            const result = await response.json();
+                const result = await response.json();
 
-            if (!response.ok) {
-                // Check if backend returned detailed suggestions (e.g. over-constrained filters)
-                if (result.suggestions && result.suggestions.length > 0) {
-                    showOverConstrainedError(result.error || "No restaurants matched your filters.", result.suggestions);
-                } else {
-                    throw new Error(result.error || "An error occurred while generating recommendations.");
+                if (!response.ok) {
+                    // Check if backend returned detailed suggestions (e.g. over-constrained filters)
+                    if (result.suggestions && result.suggestions.length > 0) {
+                        hideGlobalLoading();
+                        showOverConstrainedError(result.error || "No restaurants matched your filters.", result.suggestions);
+                    } else {
+                        throw new Error(result.error || "An error occurred while generating recommendations.");
+                    }
+                    return;
                 }
-                return;
+
+                // Success: Hide overlay
+                hideGlobalLoading();
+
+                // Render Results
+                renderRecommendations(result);
+
+            } catch (err) {
+                console.error(err);
+                showGlobalLoadingError(err.message || "Unable to reach the server. Please verify that the backend is running.");
+            } finally {
+                setLoading(false);
             }
+        };
 
-            // Render Results
-            renderRecommendations(result);
-
-        } catch (err) {
-            console.error(err);
-            showError(err.message || "Unable to reach the server. Please verify that the backend is running.");
-        } finally {
-            setLoading(false);
-        }
+        await fetchRecommendations();
     });
 
     // Toggle loading states

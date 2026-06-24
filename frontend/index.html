@@ -238,6 +238,38 @@
         </section>
     </div>
 
+    <!-- Creative Global Loading Overlay -->
+    <div id="global-loading-overlay" class="modal-overlay hidden">
+        <div class="loading-card glassmorphism shadow-soft">
+            <div class="loading-food-animation">
+                <span class="food-emoji bubble-1">🍕</span>
+                <span class="food-emoji bubble-2">🍔</span>
+                <span class="food-emoji bubble-3">🍜</span>
+                <span class="food-emoji bubble-4">🍰</span>
+                <span class="food-emoji main-pulse">🔍</span>
+            </div>
+            <h3 id="loading-title">🍕 Sniffing out the best restaurants...</h3>
+            <p id="loading-subtitle">This may take up to a minute on the first visit.</p>
+            
+            <div class="premium-progress-bar" id="loading-progress-bar">
+                <div class="progress-bar-fill"></div>
+            </div>
+            
+            <!-- Dynamic nap warning text, hidden by default -->
+            <p id="loading-nap-text" class="nap-warning hidden">
+                Looks like our recommendation engine is waking up from a quick nap. Hang tight while we prepare your dining suggestions.
+            </p>
+
+            <!-- Friendly error container with Retry button, hidden by default -->
+            <div id="loading-error-container" class="hidden">
+                <p id="loading-error-message" class="error-text"></p>
+                <button type="button" id="loading-retry-btn" class="btn-recommend btn-retry">
+                    <span class="material-symbols-outlined">refresh</span> Retry Connection
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal for adding custom tags -->
     <div id="custom-tag-modal" class="modal-overlay hidden">
         <div class="modal-card">
