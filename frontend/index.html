@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zomato AI - Find Your Perfect Meal</title>
+    <meta name="description" content="Discover the best dining spots with Zomato AI. Tailored matches using Hugging Face Zomato dataset and Gemini intelligence.">
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Material Symbols Outlined -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Top Navbar -->
+    <nav class="top-navbar">
+        <div class="nav-container">
+            <a href="#" class="brand">
+                <span class="brand-zomato">zomato</span>
+                <span class="brand-ai">AI</span>
+            </a>
+            <div class="nav-links">
+                <a href="#" class="nav-link active">Home</a>
+                <a href="#" class="nav-link">Favorites</a>
+            </div>
+            <!-- Empty placeholder to balance flex row -->
+            <div style="width: 80px;"></div>
+        </div>
+    </nav>
+
+    <!-- Full-width Hero Banner Section -->
+    <section class="hero-banner">
+        <div class="hero-overlay"></div>
+        <div class="hero-content-wrapper">
+            <h1 class="hero-title">Find Your Perfect Meal with Zomato AI ✨</h1>
+            <p class="hero-subtitle">Your AI food companion that knows your taste</p>
+            
+            <!-- Conversational Search Bar -->
+            <div class="conversational-search-bar">
+                <input type="text" id="conversational-search-input" placeholder="Hi! What are you craving today?" aria-label="Craving Search">
+                <button type="button" class="mic-btn" aria-label="Voice Search">
+                    <span class="material-symbols-outlined">mic</span>
+                </button>
+                <button type="button" id="conversational-search-send" class="send-btn">
+                    <span>Send</span>
+                </button>
+            </div>
+
+            <!-- Quick Preference Chips -->
+            <div class="quick-preference-chips">
+                <button type="button" class="quick-chip" data-value="Italian" data-cuisine="Italian">🍝 Italian</button>
+                <button type="button" class="quick-chip" data-value="Spicy" data-context="Spicy">🌶️ Spicy</button>
+                <button type="button" class="quick-chip" data-value="Dessert" data-cuisine="Desserts">🍰 Dessert</button>
+                <button type="button" class="quick-chip" data-value="Near Me" id="near-me-chip">📍 Near Me</button>
+                <button type="button" class="quick-chip" data-value="Rooftop Dining" data-context="Rooftop Dining">🌃 Rooftop Dining</button>
+                <button type="button" class="quick-chip" data-value="Family Friendly" data-context="Family Friendly">👥 Family Friendly</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Container -->
+    <div class="app-container">
+        <!-- Floating Preference Card -->
+        <section class="floating-preference-card shadow-soft">
+            <h2 class="card-title">Tell us your preferences <span class="optional-text">(Optional)</span> <span class="sparkle-pink">✨</span></h2>
+            
+            <form id="preferences-form" novalidate>
+                <!-- Form Grid Row 1 -->
+                <div class="form-grid-row">
+                    <!-- Location Selector -->
+                    <div class="form-field">
+                        <label for="location-select">
+                            <span class="material-symbols-outlined label-icon">location_on</span>
+                            Location
+                        </label>
+                        <div class="input-wrapper-icon">
+                            <select id="location-select" name="location" required>
+                                <option value="" disabled selected>e.g., BTM</option>
+                            </select>
+                            <button type="button" id="geo-location-btn" class="geo-btn" title="Use Current Location">
+                                <span class="material-symbols-outlined">target</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Cuisine Type -->
+                    <div class="form-field">
+                        <label for="cuisine-input">
+                            <span class="material-symbols-outlined label-icon">restaurant</span>
+                            Cuisine
+                        </label>
+                        <input type="text" id="cuisine-input" name="cuisine" placeholder="e.g., North Indian" list="cuisines-list">
+                        <datalist id="cuisines-list">
+                            <option value="North Indian">
+                            <option value="Chinese">
+                            <option value="South Indian">
+                            <option value="Fast Food">
+                            <option value="Italian">
+                            <option value="Continental">
+                            <option value="Desserts">
+                            <option value="Cafe">
+                            <option value="Beverages">
+                            <option value="Biryani">
+                            <option value="Bakery">
+                        </datalist>
+                    </div>
+
+                    <!-- Budget for two -->
+                    <div class="form-field">
+                        <label>
+                            <span class="material-symbols-outlined label-icon">payments</span>
+                            Budget for two
+                        </label>
+                        <div class="budget-pills-row" role="radiogroup" aria-required="true" id="budget-group">
+                            <label class="budget-pill-label">
+                                <input type="radio" id="budget-low" name="budget" value="low">
+                                <span class="budget-pill-btn">₹</span>
+                            </label>
+                            <label class="budget-pill-label">
+                                <input type="radio" id="budget-medium" name="budget" value="medium" checked>
+                                <span class="budget-pill-btn">₹₹</span>
+                            </label>
+                            <label class="budget-pill-label">
+                                <input type="radio" id="budget-high" name="budget" value="high">
+                                <span class="budget-pill-btn">₹₹₹</span>
+                            </label>
+                            <label class="budget-pill-label">
+                                <input type="radio" id="budget-high-max" name="budget" value="high">
+                                <span class="budget-pill-btn">₹₹₹₹</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Minimum Rating -->
+                    <div class="form-field">
+                        <label for="rating-select">
+                            <span class="material-symbols-outlined label-icon">star</span>
+                            Minimum Rating
+                        </label>
+                        <div class="select-wrapper">
+                            <select id="rating-select" name="min_rating">
+                                <option value="0.0" selected>Any Rating</option>
+                                <option value="3.0">3.0+ ★</option>
+                                <option value="3.5">3.5+ ★</option>
+                                <option value="4.0">4.0+ ★</option>
+                                <option value="4.5">4.5+ ★</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Grid Row 2: Additional Preferences and Submit -->
+                <div class="form-flex-row">
+                    <div class="additional-pref-section">
+                        <label>Additional Preferences</label>
+                        <div class="pref-chips-row" id="pref-chips-container">
+                            <button type="button" class="pref-chip-btn" data-value="outdoor seating">Outdoor Seating</button>
+                            <button type="button" class="pref-chip-btn" data-value="pet friendly">Pet Friendly</button>
+                            <button type="button" class="pref-chip-btn" data-value="live music">Live Music</button>
+                            <button type="button" class="pref-chip-btn" data-value="rooftop">Rooftop Dining</button>
+                            <button type="button" class="pref-chip-btn add-more-btn" id="add-more-chip-btn">
+                                <span class="material-symbols-outlined">add</span> Add more
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-submit-section">
+                        <!-- Keep a hidden context-textarea for app.js character counter and context sync -->
+                        <textarea id="context-textarea" name="additional_context" class="hidden"></textarea>
+                        <span id="char-counter" class="hidden">0 / 500</span>
+
+                        <button type="submit" id="submit-btn" class="btn-recommend">
+                            <span class="btn-text">✨ Get AI Recommendations</span>
+                            <span class="spinner hidden"></span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <!-- Recommendations Results Section -->
+        <section class="results-section" aria-labelledby="results-title">
+            <div class="results-header">
+                <div class="results-header-titles">
+                    <h2 id="results-title" class="section-title">AI Recommendations for You ✨</h2>
+                    <p class="section-subtitle-text">Curated just for your taste and mood</p>
+                </div>
+                <div class="results-header-actions">
+                    <span id="ai-badge" class="badge badge-ai hidden">AI-Powered</span>
+                    <span id="fallback-badge" class="badge badge-fallback hidden">Structured Fallback (AI Offline)</span>
+                    <a href="#" class="view-all-link">View all <span class="material-symbols-outlined">chevron_right</span></a>
+                </div>
+            </div>
+
+            <!-- Initial State / Loading / Error -->
+            <div id="results-placeholder" class="placeholder-box">
+                <div class="placeholder-icon">🍽️</div>
+                <p>Select your favorite location and submit above to find your perfect meal.</p>
+            </div>
+
+            <div id="results-loading" class="placeholder-box hidden">
+                <div class="loading-animation">
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                </div>
+                <p class="loading-status">Curating Zomato AI recommendations...</p>
+            </div>
+
+            <div id="results-error" class="placeholder-box error-box hidden">
+                <div class="placeholder-illustration">
+                    <span class="material-symbols-outlined text-primary" style="font-size: 64px;">search_off</span>
+                </div>
+                <h3 class="error-title">No Matches Found</h3>
+                <p id="error-message">We couldn't find matches. Try relaxing your preference filters below.</p>
+                <div id="relaxation-suggestions-container" class="hidden">
+                    <p class="suggestions-lead">Try relaxing your filters:</p>
+                    <div id="relaxation-suggestions-list" class="suggestions-grid"></div>
+                </div>
+            </div>
+
+            <!-- Results Content -->
+            <div id="results-content" class="hidden">
+                <div id="summary-card" class="summary-card glassmorphism">
+                    <div class="summary-icon-box">
+                        <span class="material-symbols-outlined summary-icon">lightbulb</span>
+                    </div>
+                    <div class="summary-text-container">
+                        <span class="summary-tag">AI Insights</span>
+                        <p id="summary-text"></p>
+                    </div>
+                </div>
+                <div id="cards-container" class="cards-grid-2col"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal for adding custom tags -->
+    <div id="custom-tag-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3>Add Custom Preference</h3>
+            <input type="text" id="custom-tag-input" placeholder="e.g., Valet Parking, Craft Beer" autofocus>
+            <div class="modal-actions">
+                <button type="button" id="modal-cancel-btn" class="modal-btn">Cancel</button>
+                <button type="button" id="modal-add-btn" class="modal-btn btn-primary-color">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <a href="#" class="brand">
+                    <span class="brand-zomato">zomato</span>
+                    <span class="brand-ai">AI</span>
+                </a>
+                <p class="copyright-text">&copy; 2026 Zomato AI Labs | All rights reserved.</p>
+            </div>
+            <div class="footer-right">
+                <span class="follow-text">Follow Us</span>
+                <div class="social-icons">
+                    <a href="#" class="social-icon" aria-label="Facebook">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79z"></path></svg>
+                    </a>
+                    <a href="#" class="social-icon" aria-label="Instagram">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"></path></svg>
+                    </a>
+                    <a href="#" class="social-icon" aria-label="Twitter">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M23.953 4.57a10 10 0 0 1-2.825.775 4.958 4.958 0 0 0 2.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 0 0-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 0 0-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 0 1-2.228-.616v.06a4.923 4.923 0 0 0 3.946 4.827 4.996 4.996 0 0 1-2.212.085 4.936 4.936 0 0 0 4.604 3.417 9.867 9.867 0 0 1-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 0 0 7.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0 0 24 4.59z"></path></svg>
+                    </a>
+                    <a href="#" class="social-icon" aria-label="YouTube">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.108C19.53 3.53 12 3.53 12 3.53s-7.53 0-9.388.525A3.003 3.003 0 0 0 .502 6.163C0 8.07 0 12 0 12s0 3.93.502 5.837a3.003 3.003 0 0 0 2.11 2.108c1.858.525 9.388.525 9.388.525s7.53 0 9.388-.525a3.003 3.003 0 0 0 2.11-2.108C24 15.93 24 12 24 12s0-3.93-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"></path></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Main Logic -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

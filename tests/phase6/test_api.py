@@ -30,6 +30,13 @@ def test_locations_route(client):
     assert len(data) > 0
 
 
+def test_cors_headers(client):
+    """Test that CORS headers are present on API responses."""
+    response = client.get("/api/locations")
+    assert response.status_code == 200
+    assert "Access-Control-Allow-Origin" in response.headers or response.headers.get("Access-Control-Allow-Origin") == "*"
+
+
 def test_recommendations_invalid_json(client):
     """Test recommend endpoint with invalid JSON body."""
     response = client.post("/api/recommend", data="not json", content_type="application/json")
@@ -45,3 +52,4 @@ def test_recommendations_missing_location(client):
     assert response.status_code == 400
     data = json.loads(response.data)
     assert "error" in data
+

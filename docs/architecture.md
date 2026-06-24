@@ -473,31 +473,30 @@ flowchart TD
 
 ---
 
-## Phase 8: Deployment (Streamlit)
+## Phase 8: Deployment (Render & Vercel)
 
 ### Purpose
 
-Package and deploy the Zomato AI landing page as a Streamlit web application using free-tier cloud platforms.
+Deploy the application as a decoupled architecture: the Flask API backend on Render and the static HTML/CSS/JS frontend on Vercel.
 
 ### Components
 
 | Component | Responsibility |
 |-----------|----------------|
-| **Streamlit Web App (`streamlit_app.py`)** | A single-page python script implementing the premium Zomato AI layout (search bar, inputs, recommendations grid) and consuming backend pipeline modules directly. |
-| **Secrets Manager** | Safely supply variables like `GEMINI_API_KEY` using Streamlit Cloud's secrets configuration (`st.secrets`) or Hugging Face Space secrets. |
-| **Streamlit Community Cloud** | Free hosting platform connected to GitHub for automatic builds and deployments. |
-| **Hugging Face Spaces (Streamlit SDK)** | Alternative free hosting space natively running the Streamlit app container. |
+| **Backend Service (Render)** | Hosts the Python Flask application (`app.py`), enabling CORS support, and serving the REST API endpoints. Uses Gunicorn for the production WSGI server. |
+| **Frontend Service (Vercel)** | Hosts the static frontend directory (`frontend/`), serving `index.html` and assets. Utilizes `vercel.json` rewrites to proxy `/api/` requests to Render. |
+| **Secrets Manager (Render)** | Safely configures API keys (e.g. `GEMINI_API_KEY`, `FLASK_ENV`) as environment variables. |
 
 ### Inputs & Outputs
 
-- **Input:** GitHub code repository + Cloud Secrets (`GEMINI_API_KEY`)
-- **Output:** Active web app URL serving the Zomato AI landing page interface
+- **Input:** GitHub code repository + Cloud environment variables (`GEMINI_API_KEY`)
+- **Output:** Two deployment URLs (Render API backend and Vercel static frontend) working together via proxying.
 
 ### Phase Deliverables
 
-- `streamlit` dependency added to `requirements.txt`
-- `streamlit_app.py` created in project root folder containing UI layouts and backend pipeline triggers
-- Active production deployment link (e.g. `*.streamlit.app` or Hugging Face Spaces URL)
+- `flask-cors` dependency added to `requirements.txt` to support Cross-Origin Resource Sharing.
+- Frontend directory structure created under `frontend/` containing `index.html`, static assets, and `vercel.json` rewrite configuration.
+- Active backend production deployment on Render and active frontend production deployment on Vercel.
 
 ---
 
@@ -519,14 +518,27 @@ project/
 │   └── parser.py             # Phase 4: response parsing
 ├── phase5/
 │   └── formatter.py          # Phase 5: view models
-├── templates/
-│   └── index.html            # Web UI main document
-├── static/
-│   ├── css/
-│   │   └── style.css         # UI Styling stylesheets
-│   └── js/
-│       └── app.js            # UI Client state and request handler
-└── app.py                    # Orchestrates all phases
+├── phase6/
+│   └── api.py                # Phase 6: Flask API router
+├── phase7/
+│   ├── templates/
+│   │   └── index.html        # Local fallback index page template
+│   └── static/
+│       ├── css/
+│       │   └── style.css     # Local fallback stylesheet
+│       └── js/
+│           └── app.js        # Local fallback client script
+├── frontend/
+│   ├── index.html            # Vercel: main web UI page
+│   ├── vercel.json           # Vercel: URL rewrites configuration
+│   └── static/
+│       ├── css/
+│       │   └── style.css     # Vercel: UI stylesheets
+│       ├── js/
+│       │   └── app.js        # Vercel: client state & API coordinator
+│       └── images/
+│           └── food_collage_banner.png # Vercel: UI assets
+└── app.py                    # Server-side app entry point
 ```
 
 

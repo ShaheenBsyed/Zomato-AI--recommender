@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import logging
 from flask import Flask, jsonify, render_template, request
+from flask_cors import CORS
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -27,6 +28,8 @@ app = Flask(
     static_folder="../phase7/static",
     template_folder="../phase7/templates"
 )
+CORS(app)  # Enable Cross-Origin Resource Sharing
+
 
 # Load Restaurant Database once on startup
 logger.info("Initializing restaurant database...")
